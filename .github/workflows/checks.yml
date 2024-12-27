@@ -1,4 +1,3 @@
----
 name: Checks
 
 on: [push]
@@ -9,12 +8,21 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_TOKEN }}
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+      - name: Set up Docker cache
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-docker-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-docker-
+      - name: Build services
+        run: docker-compose build
       - name: Test
         run: docker-compose run --rm app sh -c "python manage.py test"
       - name: Lint
