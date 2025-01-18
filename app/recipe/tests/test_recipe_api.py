@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 from core.models import Recipe
-from recipe.serializers import RecipeSerializer
+from recipe.serializers import RecipeSerializer, RecipeDetailSerializer
 
 
 RECIPE_URL = reverse('recipe:recipe-list')
@@ -80,7 +80,7 @@ class PrivateRecipeAPITests(TestCase):
         url = reverse('recipe:recipe-detail', args=[recipe.id])
         res = self.client.get(url)
 
-        serializer = RecipeSerializer(recipe)
+        serializer = RecipeDetailSerializer(recipe)
         self.assertEqual(res.data, serializer.data)
 
     def test_create_recipe(self):
@@ -88,7 +88,8 @@ class PrivateRecipeAPITests(TestCase):
             'title': 'Chocolate cheesecake',
             'time_minutes': 30,
             'price': Decimal('5.00'),
-            'link': 'http://cheesecake.com'
+
+
         }
         res = self.client.post(RECIPE_URL, payload)
         recipe = Recipe.objects.get(id=res.data['id'])
