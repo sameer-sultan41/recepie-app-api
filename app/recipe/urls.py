@@ -6,6 +6,7 @@ app_name = 'recipe'  # This defines the namespace
 
 router = DefaultRouter()
 router.register('recipe', views.RecipeViewSet)
+router.register('tags', views.TagViewSet)
 
 urlpatterns = [
     path('create/', include(router.urls)),
