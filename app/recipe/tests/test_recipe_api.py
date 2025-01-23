@@ -6,7 +6,9 @@ from rest_framework import status
 from rest_framework.test import APIClient
 from core.models import Recipe, Tag, Ingredient
 from recipe.serializers import RecipeSerializer, RecipeDetailSerializer
-
+import os
+import tempfile
+from PIL import Image
 
 RECIPE_URL = reverse('recipe:recipe-list')
 
@@ -25,6 +27,11 @@ def create_recipe(user, **params):
 
 def create_user(**params):
     return get_user_model().objects.create_user(**params)
+
+
+def image_upload_url(recipe_id):
+    """Return URL for recipe image upload"""
+    return reverse('recipe:recipe-upload-image', args=[recipe_id])
 
 
 def detail_url(recipe_id):
