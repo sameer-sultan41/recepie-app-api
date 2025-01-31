@@ -369,6 +369,42 @@ class PrivateRecipeAPITests(TestCase):
         self.assertEqual(recipe.ingredients.count(), 0)
         self.assertFalse(recipe.ingredients.exists())
 
+    def test_filter_by_tag(self):
+        '''Test returning recipes with specific tags'''
+        recipe1 = create_recipe(user=self.user, title='Thai curry')
+        recipe2 = create_recipe(user=self.user, title='Pasta with pesto')
+        tag1 = Tag.objects.create(user=self.user, name='Vegan')
+        tag2 = Tag.objects.create(user=self.user, name='Vegetarian')
+        recipe1.tags.add(tag1)
+        recipe2.tags.add(tag2)
+        recipe3 = create_recipe(user=self.user, title='Fish and chips')
+        params = {'tags': f'{tag1.id},{tag2.id}'}
+        res = self.client.get(RECIPE_URL, params)
+        s1 = RecipeSerializer(recipe1)
+        s2 = RecipeSerializer(recipe2)
+        s3 = RecipeSerializer(recipe3)
+        self.assertIn(s1.data, res.data)
+        self.assertIn(s2.data, res.data)
+        self.assertNotIn(s3.data, res.data)
+
+    def test_filter_by_ingredient(self):
+        '''Test returning recipes with specific ingredients'''
+        recipe1 = create_recipe(user=self.user, title='Thai curry')
+        recipe2 = create_recipe(user=self.user, title='Pasta with pesto')
+        ingredient1 = Ingredient.objects.create(user=self.user, name='Prawn')
+        ingredient2 = Ingredient.objects.create(user=self.user, name='Basil')
+        recipe1.ingredients.add(ingredient1)
+        recipe2.ingredients.add(ingredient2)
+        recipe3 = create_recipe(user=self.user, title='Fish and chips')
+        params = {'ingredients': f'{ingredient1.id},{ingredient2.id}'}
+        res = self.client.get(RECIPE_URL, params)
+        s1 = RecipeSerializer(recipe1)
+        s2 = RecipeSerializer(recipe2)
+        s3 = RecipeSerializer(recipe3)
+        self.assertIn(s1.data, res.data)
+        self.assertIn(s2.data, res.data)
+        self.assertNotIn(s3.data, res.data)
+
 
 class ImageUploadTest(TestCase):
     def setUp(self):
@@ -382,18 +418,6 @@ class ImageUploadTest(TestCase):
 
     def tearDown(self):
         self.recipe.image.delete()
-
-    # def test_upload_image_url(self):
-    #     url = image_upload_url(self.recipe.id)
-    #     with tempfile.NamedTemporaryFile(suffix='.jpg') as image_file:
-    #         img = Image.new('RGB', (10, 10))
-    #         img.save(image_file, format='JPEG')
-    #         payload = {'image': image_file}
-    #         res = self.client.post(url, payload, format='multipart')
-    #         self.recipe.refresh_from_db()
-    #         self.assertEqual(res.status_code, status.HTTP_200_OK)
-    #         self.assertIn('image', res.data)
-    #         self.assertTrue(os.path.exists(self.recipe.image.path))
 
     def test_upload_image(self):
         """Test uploading an image to a recipe."""
