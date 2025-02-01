@@ -13,6 +13,7 @@ from drf_spectacular.utils import (
     OpenApiResponse,
 )
 
+
 @extend_schema_view(
     list=extend_schema(
         parameters=[
@@ -92,6 +93,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
 
 
+@extend_schema_view(
+    list=extend_schema(
+       parameters=[
+           OpenApiParameter(
+               'assigned_only',
+               OpenApiTypes.INT, enum=[0, 1],
+               description='filter only assigned items',
+           )
+       ]
+    )
+)
 class BaseRecipeAttrViewSet(mixins.DestroyModelMixin,
                             mixins.UpdateModelMixin,
                             mixins.ListModelMixin,
@@ -102,7 +114,18 @@ class BaseRecipeAttrViewSet(mixins.DestroyModelMixin,
 
     def get_queryset(self):
         """Return objects for the current authenticated user only"""
-        return self.queryset.filter(user=self.request.user).order_by('-name')
+        assigned_only = bool(
+            int(self.request.query_params.get('assigned_only', 0))
+        )
+        queryset = self.queryset
+        if assigned_only:
+            return queryset.filter(
+                user=self.request.user,
+                recipe__isnull=False
+            ).distinct()
+        return queryset.filter(user=self.request.user)\
+                       .order_by('-name')\
+                       .distinct()
 
 
 class TagViewSet(BaseRecipeAttrViewSet):
