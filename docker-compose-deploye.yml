@@ -2,20 +2,20 @@ version: '3.9'
 
 services:
   app:
-   build:
-     context: .
-  restart: always
-  volumes:
-    - static-data:/vol/web
-  environment:
-    - DB_HOST=db
-    - DB_NAME=${DB_NAME}
-    - DB_USER=${DB_USER}
-    - DB_PASS=${DB_PASS}
-    - SECRET_KEY=${DJANGO_SECRET_KEY}
-    - ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
-  depends_on:
-    - db
+    build:
+      context: .
+    restart: always
+    volumes:
+      - static-data:/vol/web
+    environment:
+      - DB_HOST=db
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - SECRET_KEY=${DJANGO_SECRET_KEY}
+      - ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
+    depends_on:
+      - db
 
   db:
     image: postgres:13-alpine
@@ -26,6 +26,7 @@ services:
       - POSTGRES_PASSWORD=${DB_PASS}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
   proxy:
     build:
       context: .
@@ -33,9 +34,10 @@ services:
     depends_on:
       - app
     ports:
-      - 80:8000
+      - 8000:8000
     volumes:
       - static-data:/vol/static
+
 volumes:
   postgres_data:
   static-data:

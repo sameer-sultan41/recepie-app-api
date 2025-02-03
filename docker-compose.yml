@@ -18,6 +18,7 @@ services:
       - DB_NAME=devdb
       - DB_USER=myuser
       - DB_PASSWORD=mypassword
+      - DEBUG=1
     depends_on:
       - db # Wait for the `db` service to be ready before starting this service
 
