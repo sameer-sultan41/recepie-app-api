@@ -1,4 +1,4 @@
-version: '3.9'
+version: "3.9"
 
 services:
   app:
@@ -20,16 +20,16 @@ services:
   db:
     image: postgres:13-alpine
     restart: always
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASS}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
   proxy:
     build:
-      context: .
+      context: ./proxy
     restart: always
     depends_on:
       - app
@@ -39,5 +39,5 @@ services:
       - static-data:/vol/static
 
 volumes:
-  postgres_data:
+  postgres-data:
   static-data:
